@@ -5,14 +5,14 @@ import time
 
 pygame.init()
 
-
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 
 ### SPRITES ####
 class Sprites(object):
     """Parent class of the different sprites"""
-    def __init__(self, s_type, art):
+    def __init__(self, s_type, image):
         self.s_type = s_type
-        self.art = art
+        self.image = image
 
     def draw(self, surface, x, y):
         """Draw the sprite art on the surface"""
@@ -24,12 +24,9 @@ class Sprites(object):
 
 class HappyCat(Sprites):
     def __init__(self):
-        art = r"""
-                 /\_/\  
-                ( ^.^ ) 
-                 > ^ <
-                """
-        super().__init__("Happy", art)
+        image = pygame.image.load("images\happy_cat.png")
+        #image = pygame.transform.scale(image, SCREEN_WIDTH, SCREEN_HEIGHT)
+        super().__init__("Happy", image)
 
 
 class SadCat(Sprites):
@@ -81,6 +78,21 @@ class PlayfulCat(Sprites):
                 """
         super().__init__("Playful", art)
 
+
+
+class Food(object):
+    def __init__(self, hunger_points = 0.0, boredom_bonus = 0.0, fatigue_bonus = 0.0):
+        self.hunger_points = hunger_points
+        self.boredom_bonus = boredom_bonus
+        self.fatigue_bonus = fatigue_bonus
+        
+class Bread(Food):
+    def __init__(self, hunger_points=0.0, boredom_bonus=0.0, fatigue_bonus=0.0):
+        super().__init__(hunger_points = 0.5, boredom_bonus = 0, fatigue_bonus = 0)
+        
+    def feed_pet(self, pet):
+        
+        return self.hunger_points, self.boredom_bonus, self.fatigue_bonus
 
 class Cat:
     """Class for cats"""
@@ -171,16 +183,23 @@ class Cat:
             if status[is_bored]:
                 self.besad()
 
+    def be_fed(self):
+        text = font.render('What to eat?', True, BLACK)
+    
     def draw(self):
         """draw the current sprite to the screen
         """
         
         screen.fill(WHITE)
-        self.curr_sprite.draw(screen, 300, 200)
+        screen.blit(self.curr_sprite.image, (0, 0))
         pygame.display.flip()
 
 
+        
+        
   
+
+
 font = pygame.font.SysFont('Courier', 24)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

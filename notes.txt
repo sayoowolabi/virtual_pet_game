@@ -21,6 +21,7 @@ FUTURE PLANS:
 09/12/24
 - Added some time functionality today
 - Need to fix up comments and docstrings
+- Made some temporary sprites using AI and tested with the happy sprite
 
 
 
