@@ -180,13 +180,7 @@ class Cat:
         pygame.display.flip()
 
 
-    #def feed(self):
-
-    #def playgame
-
-    #def ageup??
-
-    # Define font
+  
 font = pygame.font.SysFont('Courier', 24)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
