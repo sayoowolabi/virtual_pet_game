@@ -1,0 +1,26 @@
+Sayo's Notes :)
+
+
+02/12/24
+
+FUTURE PLANS:
+
+- Make a class for Food
+    - Add different food items that have different effects (e.g. pizza gives +5 hunger while bread gives +2)
+
+- Make mini games 
+    	- Rock paper scissors, word games, puzzles, maybe x and os vs computer?
+
+- Make the pets stats fall over time to encourage the user to interact
+
+- Create a save log for each user & a main log linking all users
+
+- Make pngs rather than text sprites
+
+
+09/12/24
+- Added some time functionality today
+
+
+
+

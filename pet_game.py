@@ -1,18 +1,10 @@
 ##Sayo's Pet game
 
 import pygame
+import time
 
 pygame.init()
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Sayo's Pet Game")
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-
-# Define font
-font = pygame.font.SysFont('Courier', 24)
 
 
 ### SPRITES ####
@@ -92,7 +84,7 @@ class PlayfulCat(Sprites):
 
 class Cat:
     """Class for cats"""
-    def __init__(self, hunger=2, tiredness=5, boredom=5):
+    def __init__(self, hunger=5, tiredness=5, boredom=5):
         self.hunger = hunger
         self.tiredness = tiredness
         self.boredom = boredom
@@ -101,7 +93,6 @@ class Cat:
 
     def behappy(self):
         """Makes your sprite happy"""
-        ##have to pass current state to change sprite, cus sprite will check if your pet has reached the correct state
         self.curr_sprite = HappyCat()
         print(self.curr_sprite.__str__())
 
@@ -181,6 +172,9 @@ class Cat:
                 self.besad()
 
     def draw(self):
+        """draw the current sprite to the screen
+        """
+        
         screen.fill(WHITE)
         self.curr_sprite.draw(screen, 300, 200)
         pygame.display.flip()
@@ -192,25 +186,26 @@ class Cat:
 
     #def ageup??
 
+    # Define font
+font = pygame.font.SysFont('Courier', 24)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Sayo's Pet Game")
 
+    #events
+hungertick = pygame.USEREVENT + 1
+pygame.time.set_timer(hungertick, 20000)
 
+boredomtick = pygame.USEREVENT + 2
+pygame.time.set_timer(boredomtick, 10000)
 
+fatiguetick = pygame.USEREVENT + 3
+pygame.time.set_timer(fatiguetick, 100000)
 
-#class Food(object):
-
-#class Pizza(Food):
-
-#class Games
-
-#class Rock_Paper_Scissors
-
-#import time to degrade pet's feelings over time?
-
-#create save log
-#a main log of all players linking to each individual log
-
-#make pngs rather than text
-
+# Define font
+font = pygame.font.SysFont('Courier', 24)
 
 running = True
 clock = pygame.time.Clock()
@@ -221,7 +216,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        elif event.type == hungertick:
+            cat.hunger = cat.hunger - 1
+        
+        elif event.type == boredomtick:
+            cat.boredom = cat.boredom - 1
+            
+        elif event.type == fatiguetick:
+            cat.tiredness = cat.tiredness -1
+
 
     cat.checkState()
     cat.draw()
-    clock.tick(30)
+    clock.tick(60)
