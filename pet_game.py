@@ -1,99 +1,87 @@
-##Sayo's Pet game
-
 import pygame
 import time
 
+# Initialize Pygame
 pygame.init()
 
+# Screen dimensions
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 
-### SPRITES ####
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+PINK = (255, 105, 180)
+
+# Font definition
+font = pygame.font.SysFont('Courier', 24)
+
+# Screen setup
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Sayo's Pet Game")
+
+
+### SPRITES ###
 class Sprites(object):
     """Parent class of the different sprites"""
-    def __init__(self, s_type, image):
+    def __init__(self, s_type, image_path):
         self.s_type = s_type
-        self.image = image
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (200, 200))  # Resize image to fit screen
 
     def draw(self, surface, x, y):
-        """Draw the sprite art on the surface"""
-        lines = self.art.strip().split('\n')
-        for i, line in enumerate(lines):
-            text = font.render(line, True, BLACK)
-            surface.blit(text, (x, y + i * 30))
+        """Draw the sprite image on the surface"""
+        surface.blit(self.image, (x, y))
 
 
 class HappyCat(Sprites):
     def __init__(self):
-        image = pygame.image.load("images\happy_cat.png")
-        #image = pygame.transform.scale(image, SCREEN_WIDTH, SCREEN_HEIGHT)
-        super().__init__("Happy", image)
+        super().__init__("Happy", "images/happy_cat.png")
 
 
 class SadCat(Sprites):
     def __init__(self):
-        art = r"""
-                 /\_/\  
-                ( T.T ) 
-                 >   <
-                """
-        super().__init__("Sad", art)
+        super().__init__("Sad", "images/sad.png")
 
 
 class HungryCat(Sprites):
     def __init__(self):
-        art = r"""
-                 /\_/\  
-                ( o.o ) 
-                 > m <
-                """
-        super().__init__("Hungry", art)
+        super().__init__("Hungry", "images/hungry_cat.png")
 
 
 class SleepyCat(Sprites):
     def __init__(self):
-        art = r"""
-                 /\_/\  
-                (-.-) Zzz
-                 >   <
-                """
-        super().__init__("Sleepy", art)
+        super().__init__("Sleepy", "images/sleepy_cat.png")
 
 
 class AngryCat(Sprites):
     def __init__(self):
-        art = r"""
-                 /\_/\  
-                ( >.< ) 
-                 >   <
-                """
-        super().__init__("Angry", art)
+        super().__init__("Angry", "images/angry_cat.png")
 
 
 class PlayfulCat(Sprites):
     def __init__(self):
-        art = r"""
-                 /\_/\  
-                ( ^o^ ) 
-                 >   ⌒
-                """
-        super().__init__("Playful", art)
+        super().__init__("Playful", "images/playful_cat.png")
 
 
-
+### FOOD ###
 class Food(object):
-    def __init__(self, hunger_points = 0.0, boredom_bonus = 0.0, fatigue_bonus = 0.0):
+    def __init__(self, hunger_points=0.0, boredom_bonus=0.0, fatigue_bonus=0.0):
         self.hunger_points = hunger_points
         self.boredom_bonus = boredom_bonus
         self.fatigue_bonus = fatigue_bonus
-        
-class Bread(Food):
-    def __init__(self, hunger_points=0.0, boredom_bonus=0.0, fatigue_bonus=0.0):
-        super().__init__(hunger_points = 0.5, boredom_bonus = 0, fatigue_bonus = 0)
-        
-    def feed_pet(self, pet):
-        
-        return self.hunger_points, self.boredom_bonus, self.fatigue_bonus
 
+
+class Bread(Food):
+    def __init__(self):
+        super().__init__(hunger_points=3, boredom_bonus=0, fatigue_bonus=0)
+
+    def feed_pet(self, pet):
+        pet.hunger += self.hunger_points
+        if pet.hunger > 10:  # Cap hunger at 10
+            pet.hunger = 10
+
+
+### CAT ###
 class Cat:
     """Class for cats"""
     def __init__(self, hunger=5, tiredness=5, boredom=5):
@@ -102,78 +90,55 @@ class Cat:
         self.boredom = boredom
         self.curr_sprite = HappyCat()
 
-
     def behappy(self):
         """Makes your sprite happy"""
         self.curr_sprite = HappyCat()
-        print(self.curr_sprite.__str__())
 
     def besad(self):
         self.curr_sprite = SadCat()
-        print(self.curr_sprite.__str__())
 
     def behungry(self):
         self.curr_sprite = HungryCat()
-        print(self.curr_sprite.__str__())
 
     def besleepy(self):
         self.curr_sprite = SleepyCat()
-        print(self.curr_sprite.__str__())
 
     def beangry(self):
         self.curr_sprite = AngryCat()
-        print(self.curr_sprite.__str__())
 
     def beplayful(self):
         self.curr_sprite = PlayfulCat()
-        print(self.curr_sprite.__str__())
-
 
     def checkState(self):
         is_hungry, is_tired, is_bored, is_fine, is_sad, is_angry = "hunger", "fatigue", "boredom", "happiness", "default", "anger"
-        status = {is_hungry: True, is_tired: True, is_bored: True, is_fine: True, is_angry: True, is_sad: True}
+        status = {is_hungry: False, is_tired: False, is_bored: False, is_fine: False, is_sad: False, is_angry: False}
 
         below_threshold = 0
 
         if self.hunger < 5:
             status[is_hungry] = True
-            below_threshold = below_threshold + 1
-        else:
-            status[is_hungry] = False
+            below_threshold += 1
 
         if self.tiredness < 5:
             status[is_tired] = True
-            below_threshold = below_threshold + 1
-        else:
-            status[is_tired] = False
+            below_threshold += 1
 
         if self.boredom < 5:
             status[is_bored] = True
-            below_threshold = below_threshold + 1
-        else:
-            status[is_bored] = False
-
+            below_threshold += 1
 
         if below_threshold >= 3:
             self.beangry()
             status[is_angry] = True
             return
-        else:
-            status[is_angry] = False
-
-        if below_threshold > 2:
+        elif below_threshold > 1:
             self.besad()
             status[is_sad] = True
             return
-        else:
-            status[is_sad] = False
-
-        if below_threshold == 0:
+        elif below_threshold == 0:
             self.behappy()
             status[is_fine] = True
             return
-        else:
-            status[is_fine] = False
 
         if not status[is_sad] or status[is_angry]:
             if status[is_hungry]:
@@ -183,46 +148,41 @@ class Cat:
             if status[is_bored]:
                 self.besad()
 
-    def be_fed(self):
-        text = font.render('What to eat?', True, BLACK)
-    
-    def draw(self):
-        """draw the current sprite to the screen
-        """
+    def draw(self, feeding_menu):
+        """Draw the current sprite and instructions on the screen"""
         
         screen.fill(WHITE)
-        screen.blit(self.curr_sprite.image, (0, 0))
+        self.curr_sprite.draw(screen, (SCREEN_WIDTH - self.curr_sprite.image.get_width()) // 2, (SCREEN_HEIGHT - self.curr_sprite.image.get_height()) // 2)
+        
+        if feeding_menu:
+            feed_text = font.render('Press B to feed the pet bread', True, PINK)
+        else:
+            feed_text = font.render('Press F to feed the pet', True, PINK)
+            
+        screen.blit(feed_text, (20, 20))
+        
         pygame.display.flip()
 
 
-        
-        
-  
 
-
-font = pygame.font.SysFont('Courier', 24)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Sayo's Pet Game")
-
-    #events
+### EVENTS ###
 hungertick = pygame.USEREVENT + 1
-pygame.time.set_timer(hungertick, 20000)
+pygame.time.set_timer(hungertick, 20000)  # Hunger decreases every 20 seconds
 
 boredomtick = pygame.USEREVENT + 2
-pygame.time.set_timer(boredomtick, 10000)
+pygame.time.set_timer(boredomtick, 10000)  # Boredom increases every 10 seconds
 
 fatiguetick = pygame.USEREVENT + 3
-pygame.time.set_timer(fatiguetick, 100000)
+pygame.time.set_timer(fatiguetick, 100000)  # Fatigue increases every 100 seconds
 
-# Define font
-font = pygame.font.SysFont('Courier', 24)
 
+### GAME LOOP ###
 running = True
 clock = pygame.time.Clock()
 cat = Cat()
+bread = Bread()
+
+feeding_menu = False
 
 while running:
     for event in pygame.event.get():
@@ -230,15 +190,24 @@ while running:
             running = False
 
         elif event.type == hungertick:
-            cat.hunger = cat.hunger - 1
+            cat.hunger = max(0, cat.hunger - 1)
         
         elif event.type == boredomtick:
-            cat.boredom = cat.boredom - 1
+            cat.boredom = max(0, cat.boredom - 1)
             
         elif event.type == fatiguetick:
-            cat.tiredness = cat.tiredness -1
-
+            cat.tiredness = max(0, cat.tiredness - 1)
+        
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_f:  # If player presses F show feed menu
+                feeding_menu = True
+            
+            elif event.key == pygame.K_b and feeding_menu:  # Feed the pet bread
+                bread.feed_pet(cat)
+                feeding_menu = False 
 
     cat.checkState()
-    cat.draw()
+    cat.draw(feeding_menu)
     clock.tick(60)
+
+pygame.quit()

@@ -23,6 +23,12 @@ FUTURE PLANS:
 - Need to fix up comments and docstrings
 - Made some temporary sprites using AI and tested with the happy sprite
 
+10/12/24
+- Added a feeding menu and added the option to feed the pet bread
+- Added the temporary images into all the sprite states
+- Added some comments
+- Prompt the user to feed the pet
+- Arranged some of the code around for neatness
 
 
 
