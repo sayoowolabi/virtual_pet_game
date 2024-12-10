@@ -30,5 +30,10 @@ FUTURE PLANS:
 - Prompt the user to feed the pet
 - Arranged some of the code around for neatness
 
+- Need to add more food child classes
+- Start working on the mini games 
+- Change the sprites up again from the temporary ones to get closer to what I want
+- Animation?
+
 
 
