@@ -12,6 +12,9 @@ pygame.init()
 font = pygame.font.SysFont('Verdana', 24)
 
 # Screen setup
+background_image = pygame.image.load("images/background.jpg")
+background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Sayo's Pet Game")
 
@@ -46,7 +49,7 @@ class HungryCat(Sprites):
 
 class SleepyCat(Sprites):
     def __init__(self):
-        super().__init__("Sleepy", "images/sleepy_cat.png")
+        super().__init__("Sleepy", "images/sad.png")
 
 
 class AngryCat(Sprites):
@@ -209,12 +212,13 @@ class Cat:
                 self.besleepy()
             if status[is_bored]:
                 self.besad()
+            if not status[is_bored] and self.boredom > 6:
+                self.beplayful()
 
     def draw(self, feeding_menu, game_menu, homescreen_state):
         """Draw the current sprite and instructions on the screen"""
         
         
-        screen.fill(WHITE)
         self.curr_sprite.draw(screen, (SCREEN_WIDTH - self.curr_sprite.image.get_width()) // 2, (SCREEN_HEIGHT - self.curr_sprite.image.get_height()) // 2)
         
         if homescreen_state == True:
@@ -226,20 +230,20 @@ class Cat:
                 boredom_stat = font.render(f'Boredom: {cat.boredom}', True, BLUE)
 
                 # Blit (draw) the text onto the screen
-                screen.blit(hunger_stat, (2, 20))
-                screen.blit(tiredness_stat, (2, 50))
-                screen.blit(boredom_stat, (2, 80))
-                screen.blit(instructions_text_1, (SCREEN_WIDTH // 2 - instructions_text_1.get_width() // 2, 100))
-                screen.blit(instructions_text_2, (SCREEN_WIDTH // 2 - instructions_text_2.get_width() // 2, 150))
+                screen.blit(hunger_stat, (20, 490))
+                screen.blit(tiredness_stat, (20, 520))
+                screen.blit(boredom_stat, (20, 550))
+                screen.blit(instructions_text_1, (SCREEN_WIDTH // 2 - instructions_text_1.get_width() // 2, 500))
+                screen.blit(instructions_text_2, (SCREEN_WIDTH // 2 - instructions_text_2.get_width() // 2, 550))
         else:
             if feeding_menu:
                 instructions_text = font.render('Press B to feed the pet bread', True, BLACK)
-                screen.blit(instructions_text, (SCREEN_WIDTH // 2 - instructions_text.get_width() // 2, 100))
+                screen.blit(instructions_text, (SCREEN_WIDTH // 2 - instructions_text.get_width() // 2, 500))
 
             
             if game_menu:
                 instructions_text = font.render('Press W to play a word game', True, BLACK)
-                screen.blit(instructions_text, (SCREEN_WIDTH // 2 - instructions_text.get_width() // 2, 100))
+                screen.blit(instructions_text, (SCREEN_WIDTH // 2 - instructions_text.get_width() // 2, 500))
 
             
                     
@@ -249,13 +253,13 @@ class Cat:
 
 ### EVENTS ###
 hungertick = pygame.USEREVENT + 1
-pygame.time.set_timer(hungertick, 20000)  # Hunger decreases every 20 seconds
+pygame.time.set_timer(hungertick, 15000)  
 
 boredomtick = pygame.USEREVENT + 2
-pygame.time.set_timer(boredomtick, 10000)  # Boredom increases every 10 seconds
+pygame.time.set_timer(boredomtick, 10000)  
 
 fatiguetick = pygame.USEREVENT + 3
-pygame.time.set_timer(fatiguetick, 100000)  # Fatigue increases every 100 seconds
+pygame.time.set_timer(fatiguetick, 100000)  
 
 
 ### GAME LOOP ###
@@ -270,6 +274,9 @@ bread = Bread()
 games = Games()
 
 while running:
+    
+    screen.blit(background_image, (0, 0))
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
