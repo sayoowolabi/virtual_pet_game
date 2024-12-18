@@ -1,19 +1,15 @@
 import pygame
 import time
+from functions import choose_word, draw_game_state, check_match, display_message, SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, GREEN, BLUE, GRAY, LIVES, FPS
+import sys
+
 
 # Initialize Pygame
 pygame.init()
 
-# Screen dimensions
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-PINK = (255, 105, 180)
 
 # Font definition
-font = pygame.font.SysFont('Courier', 24)
+font = pygame.font.SysFont('Verdana', 24)
 
 # Screen setup
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -80,6 +76,72 @@ class Bread(Food):
         if pet.hunger > 10:  # Cap hunger at 10
             pet.hunger = 10
 
+
+### GAMES ###
+
+class Games:
+    def __init__(self, boredom_points = 1):
+        self.boredom_points = boredom_points
+    
+    def wordgame(self):
+        
+
+        """Main game loop for the word game"""
+        word = choose_word()
+        player_word = [None] * len(word)
+        for i in range(0,len(player_word)):
+            player_word[i] = "_"
+            
+        incorrect_guesses = []
+        lives_left = 8
+
+        running = True
+        while running:
+            draw_game_state(screen, word, player_word, incorrect_guesses, lives_left)
+            correct = False
+            cont = True
+
+            for event in pygame.event.get():    
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                    
+                elif event.type == pygame.KEYDOWN:
+                    if event.unicode.isalpha() and len(event.unicode) == 1:
+                        player_guess = event.unicode.lower()
+                        for i, char in enumerate(word):
+                            if char == player_guess:
+                                player_word[i] = char
+                                cont = display_message(screen, "Correct!", GREEN)
+                                correct = True
+                                if not cont:
+                                    return
+                        if correct == False:
+                            incorrect_guesses.append(player_guess)
+                            cont = display_message(screen, "Wrong!", RED)
+                            lives_left -= 1
+                            if not cont:
+                                return
+
+            if check_match(word, player_word):
+                draw_game_state(screen, word, player_word, incorrect_guesses, lives_left)
+                display_message(screen, "You win!", GREEN)
+                running = False
+                
+            
+            if lives_left <= 0:
+                draw_game_state(screen, word, player_word, incorrect_guesses, lives_left)
+                display_message(screen, f"You lost! The word was: {word}", RED)
+                running = False
+
+    def play(self, pet):
+        
+        pet.boredom = pet.boredom + self.boredom_points
+        
+        if pet.boredom > 10:
+            pet.boredom = 10
+        
+        
 
 ### CAT ###
 class Cat:
@@ -148,19 +210,39 @@ class Cat:
             if status[is_bored]:
                 self.besad()
 
-    def draw(self, feeding_menu):
+    def draw(self, feeding_menu, game_menu, homescreen_state):
         """Draw the current sprite and instructions on the screen"""
+        
         
         screen.fill(WHITE)
         self.curr_sprite.draw(screen, (SCREEN_WIDTH - self.curr_sprite.image.get_width()) // 2, (SCREEN_HEIGHT - self.curr_sprite.image.get_height()) // 2)
         
-        if feeding_menu:
-            feed_text = font.render('Press B to feed the pet bread', True, PINK)
+        if homescreen_state == True:
+            if homescreen_state:
+                instructions_text_1 = font.render("Press P to play a game", True, BLACK)
+                instructions_text_2 = font.render("Press F to feed the pet", True, BLACK)
+                hunger_stat = font.render(f'Hunger: {cat.hunger}', True, BLUE)
+                tiredness_stat = font.render(f'Tiredness: {cat.tiredness}', True, BLUE)
+                boredom_stat = font.render(f'Boredom: {cat.boredom}', True, BLUE)
+
+                # Blit (draw) the text onto the screen
+                screen.blit(hunger_stat, (2, 20))
+                screen.blit(tiredness_stat, (2, 50))
+                screen.blit(boredom_stat, (2, 80))
+                screen.blit(instructions_text_1, (SCREEN_WIDTH // 2 - instructions_text_1.get_width() // 2, 100))
+                screen.blit(instructions_text_2, (SCREEN_WIDTH // 2 - instructions_text_2.get_width() // 2, 150))
         else:
-            feed_text = font.render('Press F to feed the pet', True, PINK)
+            if feeding_menu:
+                instructions_text = font.render('Press B to feed the pet bread', True, BLACK)
+                screen.blit(instructions_text, (SCREEN_WIDTH // 2 - instructions_text.get_width() // 2, 100))
+
             
-        screen.blit(feed_text, (20, 20))
-        
+            if game_menu:
+                instructions_text = font.render('Press W to play a word game', True, BLACK)
+                screen.blit(instructions_text, (SCREEN_WIDTH // 2 - instructions_text.get_width() // 2, 100))
+
+            
+                    
         pygame.display.flip()
 
 
@@ -179,10 +261,13 @@ pygame.time.set_timer(fatiguetick, 100000)  # Fatigue increases every 100 second
 ### GAME LOOP ###
 running = True
 clock = pygame.time.Clock()
-cat = Cat()
-bread = Bread()
 
 feeding_menu = False
+game_menu = False
+homescreen_state = True
+cat = Cat()
+bread = Bread()
+games = Games()
 
 while running:
     for event in pygame.event.get():
@@ -199,15 +284,30 @@ while running:
             cat.tiredness = max(0, cat.tiredness - 1)
         
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_f:  # If player presses F show feed menu
+            if event.key == pygame.K_f:  # If player presses F, show feed menu
                 feeding_menu = True
-            
+                game_menu = False
+                homescreen_state = False
+                
             elif event.key == pygame.K_b and feeding_menu:  # Feed the pet bread
                 bread.feed_pet(cat)
-                feeding_menu = False 
+                feeding_menu = False  # Return to homescreen
+                homescreen_state = True
+                
+            elif event.key == pygame.K_p:
+                game_menu = True
+                feeding_menu = False
+                homescreen_state = False
+
+            elif event.key == pygame.K_w and game_menu:
+                game_menu = False
+                games.wordgame()
+                games.play(cat)
+                homescreen_state = True
+
 
     cat.checkState()
-    cat.draw(feeding_menu)
+    cat.draw(feeding_menu, game_menu, homescreen_state)
     clock.tick(60)
 
 pygame.quit()

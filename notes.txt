@@ -35,5 +35,12 @@ FUTURE PLANS:
 - Change the sprites up again from the temporary ones to get closer to what I want
 - Animation?
 
+18/12/24
+- Added my word game implemented into pygame (game made in python available in a different repo)
+- Added a view for the pet's status
+- Added a game class (where the word game was put in)
+- Transferred some functions into a seperate file for modularisation
+
+
 
 
