@@ -39,7 +39,7 @@ class HappyCat(Sprites):
 
 class SadCat(Sprites):
     def __init__(self):
-        super().__init__("Sad", "images/sad.png")
+        super().__init__("Sad", "images/sad_cat.png")
 
 
 class HungryCat(Sprites):
