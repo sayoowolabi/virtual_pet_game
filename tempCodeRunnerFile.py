@@ -1,1 +1,1 @@
-pygame.display.flip()
+from screen_setup import screen, SCREEN_HEIGHT, SCREEN_WIDTH, RED, BLACK, WHITE, GREEN, BLUE, GRAY, background_image

@@ -41,6 +41,7 @@ FUTURE PLANS:
 - Added a game class (where the word game was put in)
 - Transferred some functions into a seperate file for modularisation
 
-
-
-
+06/01/25
+- Added Pizza class
+- Moved classes to designated class file
+- Moved screen setup code to its own file
